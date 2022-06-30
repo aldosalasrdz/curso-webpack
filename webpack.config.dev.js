@@ -1,46 +1,16 @@
-const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const Dotenv = require('dotenv-webpack')
-
-const ruleForStyles = {
-  test: /\.css|\.styl$/i,
-  use: [MiniCssExtractPlugin.loader,
-    'css-loader',
-    'stylus-loader'
-  ]
-}
-
-const ruleForJavaScript = {
-  test: /\.m?js$/,
-  exclude: /node_modules/,
-   use: {
-    loader: 'babel-loader'
-  }
-}
-
-const ruleForImages = {
-  test: /\.png/,
-  type: 'asset/resource'
-}
-
-const ruleForFonts = {
-  test: /\.(woff|woff2|eot|ttf|otf)$/i,
-  type: 'asset/resource',
-  generator: {
-    filename: 'assets/fonts/[name].[contenthash].[ext]'
-  }
-}
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
-  // entry: './src/index.js',
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].js',
-    assetModuleFilename: 'assets/images/[hash][ext]'
+    assetModuleFilename: 'assets/images/[hash][ext][query]'
   },
   mode: 'development',
-  watch: true,
   resolve: {
     extensions: ['.js'],
     alias: {
@@ -52,10 +22,31 @@ module.exports = {
   },
   module: {
     rules: [
-      ruleForJavaScript,
-      ruleForStyles,
-      ruleForImages,
-      ruleForFonts
+      {
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+         use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.css|\.styl$/i,
+        use: [MiniCssExtractPlugin.loader,
+          'css-loader',
+          'stylus-loader'
+        ]
+      },
+      {
+        test: /\.png/,
+        type: 'asset/resource'
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/fonts/[name].[contenthash].[ext]'
+        }
+      }
     ]
   },
   plugins: [
@@ -68,5 +59,13 @@ module.exports = {
       filename: 'assets/[name].[contenthash].css'
     }),
     new Dotenv()
-  ]
+  ],
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist')
+    },
+    watchFiles: path.join(__dirname, './**'),
+    compress: true,
+    open: true
+  }
 }
